@@ -1,0 +1,30 @@
+.whitestar{
+    color:#cecece;
+}
+.rating-color{
+    color:#fbc634 !important;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Inconsolata:700');
+ * {
+	 margin: 0;
+	 padding: 0;
+}
+ html, body {
+	 width: 100%;
+	 height: 100%;
+}
+ body {
+	 background: linear-gradient(360deg, white 65%, #E3F1FE 80%);
+}
+
+input[type=text] {
+    width: 600px;
+    height: 50px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-radius: 20px;
+    font-size: 15px;
+    background-color: white;
+}
