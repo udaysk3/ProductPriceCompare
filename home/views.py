@@ -17,6 +17,13 @@ def searchByKeyword(req):
     combined_data = combineData(api_data1, api_data2)
     # return JsonResponse(combined_data, safe=False)
     return render(req,'index.html' , combined_data)
+def searchBytitle(title):
+    api_data1 = amazon_api(title)
+    api_data2 = flipkart_api(title)
+    
+    combined_data = combineData(api_data1, api_data2)
+    # return JsonResponse(combined_data, safe=False)
+    return combined_data
 
 
 
@@ -63,32 +70,36 @@ def searchByGTIN(req):
     api_url = 'https://barcodes1.p.rapidapi.com/?query='+gtin
     headers = {
         'X-RapidAPI-Host': 'barcodes1.p.rapidapi.com',
-        'X-RapidAPI-Key': 'd9496b245emsh6c6a6bfc69583afp1ecafajsn20b6e27e13a7',
+        'X-RapidAPI-Key': 'f2d5ee7c65msh1b0e363134f2b2ap1cff01jsn8bc746d0c27c',
     }
     try:    
         response = requests.get(api_url, headers=headers)
+        print(response.json())
         if response.status_code == 200:
             api_data = response.json()
-            asin = api_data["product"]["attributes"]["asin"]
-            amazon_item , flipkart_item = fetchByASIN(asin)
-            return HttpResponse(amazon_item)
+            print(api_data)
+            title = api_data["product"]["title"]
+            combined_data = searchBytitle(title)
             # return render(req, "compare.html", {
             #     'amazon_item' : amazon_item,
             #     'flipkart_item' : flipkart_item
             # })
+        return render(req,'index.html',combined_data)
         return HttpResponse("Some error ooccured Please Try again!")
 
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)})
 
+
 def fetchByASIN(asin):
-    api_url = 'https://amazon-scrapper-api3.p.rapidapi.com/products/'+asin+'?api_key=17fd230b65a63c27854fdb057d95524c'
+    api_url = 'https://aids.p.rapidapi.com/products/'+asin+'?api_key=c2206c49a186bdded150ff78fea282c4'
     headers = { 
-        'X-RapidAPI-Host': 'amazon-scrapper-api3.p.rapidapi.com',
+        'X-RapidAPI-Host': 'aids.p.rapidapi.com',
         'X-RapidAPI-Key': 'd9496b245emsh6c6a6bfc69583afp1ecafajsn20b6e27e13a7',
     }
     try:
         response = requests.get(api_url, headers)
+        print(response.json())
         if response.status_code == 200:
             api_data = response.json()
             amazon_item = {
@@ -115,7 +126,7 @@ def fetchByASIN(asin):
         }
     return [amazon_item, flipkart_item]
     
-    
+
 
 def flipkart_api(keyword):
     api_url = 'https://flipkart-scraper-api.dvishal485.workers.dev/search/'+keyword
@@ -126,24 +137,23 @@ def flipkart_api(keyword):
             api_data2["result"] = api_data2["result"][:5]
     except:
         api_data2 = {"results" : []}
+    return api_data2
         
         
 def amazon_api(keyword):
     api_url = 'https://real-time-amazon-data.p.rapidapi.com/search?query='+keyword+'&page=1&country=IN'
     headers = { 
         'X-RapidAPI-Host': 'real-time-amazon-data.p.rapidapi.com',
-        'X-RapidAPI-Key': 'c0bbe0d173mshba64da84edcbaddp14163ejsn21a7047f7e51',
+        'X-RapidAPI-Key': 'f2d5ee7c65msh1b0e363134f2b2ap1cff01jsn8bc746d0c27c',
     }
     try:
         response = requests.get(api_url, headers=headers)
         if response.status_code == 200:
             api_data = response.json()
-            # Limit the results to the top 5
             api_data["data"]["products"] = api_data["data"]["products"][:5]
-            # Sort the Amazon results based on keyword match and then by average rating
             # api_data["data"]["products"] = sorted(api_data["data"]["products"], key=lambda x: (-x["product_title"].count(keyword), -float(x.get("product_star_rating", 0))))
-        sample_data = {'status': 'OK', 'request_id': '9c7af152-6b4e-40d9-a9e9-37f678f66c40', 'data': {'total_products': 134, 'country': 'IN', 'products': [{'asin': 'B097BL2VSX', 'product_title': '(Refurbished) Realme 7i (Fusion Blue, 4GB RAM, 64GB Storage)', 'product_price': '₹10,999', 'product_original_price': '₹11,999', 'currency': 'INR', 'product_star_rating': '5', 'range' : range(4) ,'product_num_ratings': 10, 'product_url': 'https://www.amazon.in/dp/B097BL2VSX', 'product_photo': 'https://m.media-amazon.com/images/I/41FO5YxxFyS._AC_SX444_SY639_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹10,999', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B08KGNQJVL', 'product_title': '(Refurbished) Realme 7 (Mist Blue, 64 GB) (6 GB RAM)', 'product_price': '₹12,799.99','range' :range(int(5)), 'product_original_price': '₹13,999', 'currency': 'INR', 'product_star_rating': '3.6', 'product_num_ratings': 95, 'product_url': 'https://www.amazon.in/dp/B08KGNQJVL', 'product_photo': 'https://m.media-amazon.com/images/I/3190PsrBwUL._AC_SX290_SY416_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹12,799.99', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B08N19GBFD', 'product_title': '(Renewed) Realme 7 Pro (Mirror Silver, 6GB RAM, 128GB Storage)', 'product_price': '₹13,999', 'product_original_price': '₹14,999', 'currency': 'INR', 'product_star_rating': '3.4', 'product_num_ratings': 78, 'product_url': 'https://www.amazon.in/dp/B08N19GBFD', 'product_photo': 'https://m.media-amazon.com/images/I/51y6ryf+gGL._AC_SX444_SY639_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹13,999', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B09778HZLB', 'product_title': '(Refurbished) Realme 7 Pro (Mirror Blue, 6GB RAM, 128GB Storage)', 'product_price': '₹12,695', 'product_original_price': None, 'currency': 'INR', 'product_star_rating': '3.4', 'product_num_ratings': 23, 'product_url': 'https://www.amazon.in/dp/B09778HZLB', 'product_photo': 'https://m.media-amazon.com/images/I/41jrb4uoo2S._AC_SX348_SY500_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹12,695', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B08MB7P913', 'product_title': '(Refurbished) Realme 7 (Mist White, 64 GB) (6 GB RAM)', 'product_price': '₹9,749', 'product_original_price': '₹16,990', 'currency': 'INR', 'product_star_rating': '3.3', 'product_num_ratings': 34, 'product_url': 'https://www.amazon.in/dp/B08MB7P913', 'product_photo': 'https://m.media-amazon.com/images/I/31h2YHQ+R9L._AC_SX296_SY426_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹9,749', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}]}}
-        api_data  = sample_data
+        # sample_data = {'status': 'OK', 'request_id': '9c7af152-6b4e-40d9-a9e9-37f678f66c40', 'data': {'total_products': 134, 'country': 'IN', 'products': [{'asin': 'B097BL2VSX', 'product_title': '(Refurbished) Realme 7i (Fusion Blue, 4GB RAM, 64GB Storage)', 'product_price': '₹10,999', 'product_original_price': '₹11,999', 'currency': 'INR', 'product_star_rating': '5', 'range' : range(4) ,'product_num_ratings': 10, 'product_url': 'https://www.amazon.in/dp/B097BL2VSX', 'product_photo': 'https://m.media-amazon.com/images/I/41FO5YxxFyS._AC_SX444_SY639_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹10,999', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B08KGNQJVL', 'product_title': '(Refurbished) Realme 7 (Mist Blue, 64 GB) (6 GB RAM)', 'product_price': '₹12,799.99','range' :range(int(5)), 'product_original_price': '₹13,999', 'currency': 'INR', 'product_star_rating': '3.6', 'product_num_ratings': 95, 'product_url': 'https://www.amazon.in/dp/B08KGNQJVL', 'product_photo': 'https://m.media-amazon.com/images/I/3190PsrBwUL._AC_SX290_SY416_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹12,799.99', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B08N19GBFD', 'product_title': '(Renewed) Realme 7 Pro (Mirror Silver, 6GB RAM, 128GB Storage)', 'product_price': '₹13,999', 'product_original_price': '₹14,999', 'currency': 'INR', 'product_star_rating': '3.4', 'product_num_ratings': 78, 'product_url': 'https://www.amazon.in/dp/B08N19GBFD', 'product_photo': 'https://m.media-amazon.com/images/I/51y6ryf+gGL._AC_SX444_SY639_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹13,999', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B09778HZLB', 'product_title': '(Refurbished) Realme 7 Pro (Mirror Blue, 6GB RAM, 128GB Storage)', 'product_price': '₹12,695', 'product_original_price': None, 'currency': 'INR', 'product_star_rating': '3.4', 'product_num_ratings': 23, 'product_url': 'https://www.amazon.in/dp/B09778HZLB', 'product_photo': 'https://m.media-amazon.com/images/I/41jrb4uoo2S._AC_SX348_SY500_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹12,695', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}, {'asin': 'B08MB7P913', 'product_title': '(Refurbished) Realme 7 (Mist White, 64 GB) (6 GB RAM)', 'product_price': '₹9,749', 'product_original_price': '₹16,990', 'currency': 'INR', 'product_star_rating': '3.3', 'product_num_ratings': 34, 'product_url': 'https://www.amazon.in/dp/B08MB7P913', 'product_photo': 'https://m.media-amazon.com/images/I/31h2YHQ+R9L._AC_SX296_SY426_QL65_.jpg', 'product_num_offers': None, 'product_minimum_offer_price': '₹9,749', 'is_best_seller': False, 'is_prime': True, 'climate_pledge_friendly': False}]}}
+        # api_data  = sample_data
     except:
         api_data = {"data": {"products": []}}
     return api_data
@@ -160,11 +170,13 @@ def combineData(api_data1, api_data2):
             "product_price": amazon_product.get("product_price", ""),
             "product_photo": amazon_product.get("product_photo", ""),
             "product_original_price": amazon_product.get("product_original_price", ""),
-            "range" : range(int(amazon_product.get("product_star_rating")[0])),
             'reviewCount' : amazon_product.get("product_num_ratings"),
             "is_prime" : amazon_product.get("is_prime"),
             'url' : amazon_product.get("product_url")
         }
+        if(amazon_product.get("product_star_rating") is not None):
+            amazon_product["range"] = int(amazon_product.get("product_star_rating")[0])
+
         amazon_results.append(amazon_item)
 
     for flipkart_product in api_data2.get("result" , {}):
@@ -191,3 +203,4 @@ def combineData(api_data1, api_data2):
         "combined_results": combined_results
     }
     return combined_data
+# fetchByASIN("B00S9BOLD4") 
