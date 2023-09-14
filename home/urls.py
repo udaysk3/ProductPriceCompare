@@ -5,4 +5,5 @@ from . import views
 urlpatterns = [
     path('', views.home),
     path('searchByGTIN', views.searchByGTIN, name='searchByGTIN'),
+    path('searchByKeyword',views.searchByKeyword,name="searchByKeyword")
 ]
