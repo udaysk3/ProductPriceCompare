@@ -80,32 +80,31 @@ def searchByGTIN(req):
 
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)})
-    
 
 def fetchByASIN(asin):
-    print(asin)
-    api_url = 'https://amazon-scrapper-api3.p.rapidapi.com/products/'+str(asin)+'?api_key=17fd230b65a63c27854fdb057d95524c'
+    api_url = 'https://amazon-scrapper-api3.p.rapidapi.com/products/'+asin+'?api_key=17fd230b65a63c27854fdb057d95524c'
     headers = { 
         'X-RapidAPI-Host': 'amazon-scrapper-api3.p.rapidapi.com',
         'X-RapidAPI-Key': 'd9496b245emsh6c6a6bfc69583afp1ecafajsn20b6e27e13a7',
     }
-    response = requests.get(api_url, headers)
-    if response.status_code == 200:
-        api_data = response.json()
-        amazon_item = {
-        "product_title": api_data.get("name", ""),
-        "product_price": api_data.get("pricing", ""),
-        "shipping_price": api_data.get("shipping_price", ""),
-        "product_photo" : api_data.get("images",[]),
-        "brand": api_data.get("brand", ""),
-        "range" : range(int(api_data.get("average_rating")[0])),
-        'reviewCount' : api_data.get("total_reviews"),
-        "weight" : api_data.get("weight"),
-        'url' : 'https://amazon.in/dp/'+asin,
-    }
-    else:
-        print(response)
-    print(amazon_item)
+    try:
+        response = requests.get(api_url, headers)
+        if response.status_code == 200:
+            api_data = response.json()
+            amazon_item = {
+            "product_title": api_data.get("name", ""),
+            "product_price": api_data.get("pricing", ""),
+            "shipping_price": api_data.get("shipping_price", ""),
+            "product_photo" : api_data.get("images",[]),
+            "brand": api_data.get("brand", ""),
+            "range" : range(int(api_data.get("average_rating")[0])),
+            'reviewCount' : api_data.get("total_reviews"),
+            "weight" : api_data.get("weight"),
+            'url' : 'https://amazon.in/dp/'+asin,
+        }
+        print(amazon_item)
+    except:
+        pass
     api_data2 = flipkart_api(amazon_item["product_title"])[0]
     flipkart_item = {
             "product_title": api_data2.get("name", "  "),
@@ -117,7 +116,6 @@ def fetchByASIN(asin):
     return [amazon_item, flipkart_item]
     
     
-print(fetchByASIN('B00S9BOLD4'))
 
 def flipkart_api(keyword):
     api_url = 'https://flipkart-scraper-api.dvishal485.workers.dev/search/'+keyword
