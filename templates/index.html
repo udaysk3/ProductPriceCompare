@@ -21,7 +21,6 @@
       border:none;
       padding: 10px 50px;
     }
-
     .card::after {
       position: absolute;
       z-index: -1;
@@ -31,8 +30,6 @@
     }
 
     .card:hover {
-
-
       transform: scale(1.02, 1.02);
       -webkit-transform: scale(1.02, 1.02);
       backface-visibility: hidden; 
@@ -54,21 +51,30 @@
 </head>
 <body>
 
-
   <div class="container-fluid" style="background: linear-gradient(360deg, white 65%, #E3F1FE 80%);">
+    <form action="filterByBudget" method="POST">
+      {% csrf_token %}
+      Minimum Budget :  <input type="number" value="0" name="min_budget"> 
+      Maximum Budget :  <input type="number" value="0" name="max_budget"> 
+      <button type="submit">Go</button>
+     </form>
+    <a href="sortByPrice?sort_param=asc"><button id="sort-asc">Sort By Price(Ascending)</button></a>
+    <a href="sortByPrice?sort_param=desc"><button id="sort-asc">Sort By Price(Descending)</button></a>
+
+    
     {% comment %} {{combined_results}} {% endcomment %}
    {% if  combined_results %}
    
     <div class="container p-5">
       <div class="row">
         {% for item in combined_results %}
+        {% if item.amazon_item %}
         <div class="col-lg-6 col-md-6 mb-4">
           <div class="card h-100 shadow-lg">
             <div class="card-body">
               <div class="text-center p-3">
                 <h5 class="card-title">Amazon</h5>
                 <img width="50px" src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg" alt="amazon logo">
-
                 <br><br>
                <span class="h6">{{item.amazon_item.product_title}}</span> <br>
                 Price : <span class="h4 mt-3">Rs. {{item.amazon_item.product_price}}</span>
@@ -102,6 +108,10 @@
             </div>
           </div>
         </div>
+        {% else %}
+        <div class="col-lg-6 col-md-6 mb-4"> </div>
+        {% endif %}
+        {% if item.flipkart_item %}
         <div class="col-lg-6 col-md-6 mb-4">
           <div class="card h-100 shadow-lg">
             <div class="card-body">
@@ -130,9 +140,10 @@
             </div>
           </div>
         </div>
+        {% endif %}
         {% endfor %}
         {% else %}
-        Sorry No Products are Available on amazon and flipkart
+        Nothing to Compare
         {% endif %}
         
       </div>    
