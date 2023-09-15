@@ -68,8 +68,9 @@
 
 </head>
 <body>
-
+ 
   <div class="container-fluid" style="background: linear-gradient(360deg, white 65%, #E3F1FE 80%);">
+
     <header class="d-flex flex-wrap justify-content-center py-3 mb-3 ">
       <img src="{% static "media/SmartShop.gif"%}" width="300px" alt="SmartShop">
     </header>
@@ -88,8 +89,6 @@
         <a href="sortByPrice?sort_param=desc"><button class="btn-sm btn-success" id="sort-asc">Descending</button></a>
       </div>
     </div>
-
-    
     {% comment %} {{combined_results}} {% endcomment %}
    {% if  combined_results %}
    

@@ -9,6 +9,7 @@ import requests
 amazon_data = None
 flipkart_data = None
 
+
 # Create your views here.
 def home(req):
     return render(req,'home.html')
@@ -297,6 +298,7 @@ def combineFilterData(min_budget , max_budget,sortby='asc'):
         }
         combined_results.append(combined_item)
     # Return the combined results
+    
     combined_data = {
         "combined_results": combined_results
     }
