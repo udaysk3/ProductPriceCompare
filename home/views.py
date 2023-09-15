@@ -81,7 +81,7 @@ def searchByGTIN(req):
     api_url = 'https://barcodes1.p.rapidapi.com/?query='+gtin
     headers = {
         'X-RapidAPI-Host': 'barcodes1.p.rapidapi.com',
-        'X-RapidAPI-Key': '0c78a3ee0fmshe7346389fd693e4p131a6ajsnb70d05033882',
+        'X-RapidAPI-Key': '2a537099efmshd1a71173ebec557p1a4fd0jsn45a9f966e035',
     }
     try:    
         response = requests.get(api_url, headers=headers)
@@ -106,7 +106,7 @@ def fetchByASIN(asin):
     api_url = 'https://aids.p.rapidapi.com/products/'+asin+'?api_key=c2206c49a186bdded150ff78fea282c4'
     headers = { 
         'X-RapidAPI-Host': 'aids.p.rapidapi.com',
-        'X-RapidAPI-Key': 'd9496b245emsh6c6a6bfc69583afp1ecafajsn20b6e27e13a7',
+        'X-RapidAPI-Key': '2a537099efmshd1a71173ebec557p1a4fd0jsn45a9f966e035',
     }
     try:
         response = requests.get(api_url, headers)
@@ -158,7 +158,7 @@ def amazon_api(keyword):
     api_url = 'https://real-time-amazon-data.p.rapidapi.com/search?query='+keyword+'&page=1&country=IN'
     headers = { 
         'X-RapidAPI-Host': 'real-time-amazon-data.p.rapidapi.com',
-        'X-RapidAPI-Key': 'd28e7a2f73msh7aea935931b947cp1a8fd8jsn2369c7e7104e'}
+        'X-RapidAPI-Key': '2a537099efmshd1a71173ebec557p1a4fd0jsn45a9f966e035'}
     try:
         response = requests.get(api_url, headers=headers)
         # print(response.json())
