@@ -15,8 +15,14 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static "media/favicon-16x16.png"%}">
     <link rel="manifest" href="{% static "media/site.webmanifest"%}">
   <title>Smart Shop Compare</title>
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat&family=Libre+Baskerville&family=Poppins:ital,wght@0,300;1,400&display=swap" rel="stylesheet">
   <style>
+    .filter{
+      font-family: 'Poppins';
+      font-size: small;
+    }
     .card {
       border:none;
       padding: 10px 50px;
@@ -45,21 +51,43 @@
       color:white;
       background:#007bff;
     }
-
+    input[type=number] {
+    width: 100px;
+    height: 30px;
+    padding: 8px 16px;
+    border: 1px solid black;
+    border-radius: 15px;
+    font-size: 15px;
+    background-color: white;
+  }
+  .sortByPrice{
+    height: 40px;
+    width: max-content;
+  }
   </style>
 
 </head>
 <body>
 
   <div class="container-fluid" style="background: linear-gradient(360deg, white 65%, #E3F1FE 80%);">
-    <form action="filterByBudget" method="POST">
-      {% csrf_token %}
-      Minimum Budget :  <input type="number" value="0" name="min_budget"> 
-      Maximum Budget :  <input type="number" value="0" name="max_budget"> 
-      <button type="submit">Go</button>
-     </form>
-    <a href="sortByPrice?sort_param=asc"><button id="sort-asc">Sort By Price(Ascending)</button></a>
-    <a href="sortByPrice?sort_param=desc"><button id="sort-asc">Sort By Price(Descending)</button></a>
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-3 ">
+      <img src="{% static "media/SmartShop.gif"%}" width="300px" alt="SmartShop">
+    </header>
+    <div class="d-flex flex-row justify-content-evenly filter">
+      <div class=" col-6">
+        <form action="filterByBudget" method="POST">
+          {% csrf_token %}
+          Minimum Budget  <input type="number" value="0" name="min_budget"> 
+          Maximum Budget  <input type="number" value="0" name="max_budget"> 
+          <button class="btn-sm btn-primary mx-3" type="submit">Go</button>
+         </form>
+      </div>
+      <div class="sortByPrice col-4">
+        <span class="mx-2">Sort By Price</span>
+        <a href="sortByPrice?sort_param=asc"><button class="btn-sm btn-success" id="sort-asc">Ascending</button></a>
+        <a href="sortByPrice?sort_param=desc"><button class="btn-sm btn-success" id="sort-asc">Descending</button></a>
+      </div>
+    </div>
 
     
     {% comment %} {{combined_results}} {% endcomment %}
