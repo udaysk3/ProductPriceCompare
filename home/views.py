@@ -154,10 +154,11 @@ def flipkart_api(keyword):
         
         
 def amazon_api(keyword):
-    api_url = 'https://real-time-amazon-data.p.rapidapi.com/search?query='+keyword+'&page=1&country=US'
+    # api_url = 'https://real-time-amazon-data.p.rapidapi.com/search?query='+keyword+'&page=1&country=IN'
+    api_url = 'https://real-time-amazon-data.p.rapidapi.com/search?query='+keyword+'&page=1&country=IN'
     headers = { 
         'X-RapidAPI-Host': 'real-time-amazon-data.p.rapidapi.com',
-        'X-RapidAPI-Key': 'f2d5ee7c65msh1b0e363134f2b2ap1cff01jsn8bc746d0c27c'}
+        'X-RapidAPI-Key': 'd28e7a2f73msh7aea935931b947cp1a8fd8jsn2369c7e7104e'}
     try:
         response = requests.get(api_url, headers=headers)
         # print(response.json())
@@ -180,16 +181,26 @@ def combineData(api_data1, api_data2,sortby="own"):
     for amazon_product in api_data1.get("data", {}).get("products", []):
         amazon_item = {
             "product_title": amazon_product.get("product_title", ""),
-            "product_price": round(float(amazon_product.get("product_price", "").replace("$","").replace(",","")))*80,
+            # "product_price": amazon_product.get("product_price", ""),
+            "product_price": amazon_product.get("product_price",""),
             "product_photo": amazon_product.get("product_photo", ""),
             "product_original_price": amazon_product.get("product_original_price", ""),
             'reviewCount' : amazon_product.get("product_num_ratings"),
             "is_prime" : amazon_product.get("is_prime"),
-            'url' : amazon_product.get("product_url")
+            'url' : amazon_product.get("product_url"),
+            "in_stock" : True
         }
-       
-        if(amazon_item["url"] is not None):
-            amazon_item["url"] = amazon_product.get("product_url").replace(".com",".in")
+        # if(amazon_item["product_price"] != "" and amazon_item["product_price"] is not None):
+        #    amazon_item["product_price"]  =  round(float(amazon_product.get("product_price", "").replace("$","").replace(",","")))*80
+        # else:
+        #    amazon_item["product_price"]  =  "Not Available"
+            
+        # if(amazon_product.get("product_url") is not None):
+        #     amazon_item["url"] = amazon_product.get("product_url").replace(".com",".in")
+        if amazon_item["product_price"] is None:
+            amazon_item["in_stock"] = False
+        else:
+            amazon_item["in_stock"] = True
         amazon_results.append(amazon_item)
     
     for flipkart_product in api_data2.get("result" , {}):
@@ -198,22 +209,33 @@ def combineData(api_data1, api_data2,sortby="own"):
             "product_price": flipkart_product.get("current_price", ""),
             "product_photo": flipkart_product.get("thumbnail", ""),
             "product_original_price": flipkart_product.get("original_price", ""),
-            "url" : flipkart_product.get("link")
+            "query_url" : flipkart_product.get("query_url",""),
+            "url" : flipkart_product.get("link"),
+            "in_stock" : True
         }
+        
+        if flipkart_item["query_url"] is not None:
+            response = requests.get(flipkart_item["query_url"])
+            data = response.json()
+            if (data.get("in_stock") is not None and data["in_stock"]==True):
+                flipkart_item["in_stock"] = True
+            else:
+                flipkart_item["in_stock"] = False
+        
     
         flipkart_results.append(flipkart_item)
     if(sortby=="asc"):
         if amazon_results is not None:
-            amazon_results = sorted(amazon_results, key=lambda x: float(x["product_price"]))
-        
-        if flipkart_results is not None:
+            amazon_results = sorted(amazon_results, key=lambda x: float( x["product_price"].replace("₹", "").replace(",", "")  if x["product_price"] is not None else 0))
+        if flipkart_results is not None:    
             flipkart_results = sorted(flipkart_results, key=lambda x: float(x["product_price"]))
     elif sortby=="desc":
         if amazon_results is not None:
-            amazon_results = sorted(amazon_results, key=lambda x: float(x["product_price"]),reverse=True)
+            amazon_results = sorted(amazon_results, key=lambda x: float( x["product_price"].replace("₹", "").replace(",", "")  if x["product_price"] is not None else 0),reverse=True)
         if flipkart_results is not None:
             flipkart_results = sorted(flipkart_results, key=lambda x: float(x["product_price"]),reverse=True)
-    
+
+
     combined_results = []
     min_length = min(len(amazon_results), len(flipkart_results))
 
@@ -261,12 +283,18 @@ def combineFilterData(min_budget , max_budget,sortby='asc'):
             "product_original_price": amazon_product.get("product_original_price", ""),
             'reviewCount' : amazon_product.get("product_num_ratings"),
             "is_prime" : amazon_product.get("is_prime"),
-            'url' : amazon_product.get("product_url")
+            'url' : amazon_product.get("product_url"),
+            "in_stock" : True
         }
-        if(amazon_product.get("product_star_rating") is not None):
-            amazon_product["range"] = int(amazon_product.get("product_star_rating")[0])
-        if(int(amazon_item['product_price'].replace("₹", "").replace(",", "")) >= int(min_budget) and int(amazon_item['product_price'].replace("₹", "").replace(",", ""))<=int(max_budget)):
-            amazon_results.append(amazon_item)
+        
+        if amazon_item["product_price"] is None:
+            amazon_item["in_stock"] = False
+        else:
+            amazon_item["in_stock"] = True
+        amazon_results.append(amazon_item)
+        if(amazon_item['product_price'] is not None):
+            if(int(amazon_item['product_price'].replace("₹", "").replace(",", "")) >= int(min_budget) and int(amazon_item['product_price'].replace("₹", "").replace(",", ""))<=int(max_budget)):
+                amazon_results.append(amazon_item)
     
     for flipkart_product in api_data2.get("result" , {}):
         flipkart_item = {
@@ -274,16 +302,29 @@ def combineFilterData(min_budget , max_budget,sortby='asc'):
             "product_price": flipkart_product.get("current_price", ""),
             "product_photo": flipkart_product.get("thumbnail", ""),
             "product_original_price": flipkart_product.get("original_price", ""),
+            "query_url" : flipkart_product.get("query_url",""),
             "url" : flipkart_product.get("link")
         }
+        if flipkart_item["query_url"] is not None:
+            response = requests.get(flipkart_item["query_url"])
+            data = response.json()
+            if (data["in_stock"]=="true"):
+                flipkart_item["in_stock"] = True
+            else:
+                flipkart_item["in_stock"] = False
+        
         if(int(flipkart_item['product_price']) >= int(min_budget) and int(flipkart_item['product_price'])<=int(max_budget)):
              flipkart_results.append(flipkart_item)
     if(sortby=="asc"):
-        amazon_results = sorted(amazon_results, key=lambda x: float(x["product_price"].replace("₹", "").replace(",", "")))
-        flipkart_results = sorted(flipkart_results, key=lambda x: float(x["product_price"]))
-    else:
-        amazon_results = sorted(amazon_results, key=lambda x: float(x["product_price"].replace("₹", "").replace(",", "")),reverse=True)
-        flipkart_results = sorted(flipkart_results, key=lambda x: float(x["product_price"]),reverse=True)
+        if amazon_results is not None:
+            amazon_results = sorted(amazon_results, key=lambda x: float( x["product_price"].replace("₹", "").replace(",", "")  if x["product_price"] is not None else 0))
+        if flipkart_results is not None:    
+            flipkart_results = sorted(flipkart_results, key=lambda x: float(x["product_price"]))
+    elif sortby=="desc":
+        if amazon_results is not None:
+            amazon_results = sorted(amazon_results, key=lambda x: float( x["product_price"].replace("₹", "").replace(",", "")  if x["product_price"] is not None else 0),reverse=True)
+        if flipkart_results is not None:
+            flipkart_results = sorted(flipkart_results, key=lambda x: float(x["product_price"]),reverse=True)
     combined_results = []
     min_length = min(len(amazon_results), len(flipkart_results))
 
