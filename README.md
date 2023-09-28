@@ -32,7 +32,7 @@ To get started with the Product Price Comparator project, follow these steps:
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/your-username/product-price-comparator.git
+   https://github.com/udaysk3/ProductPriceCompare.git
    ```
 
 2. Install the required dependencies:
