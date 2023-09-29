@@ -1,6 +1,7 @@
 # Product Price Comparator
 
-This project is implemented for the InnoExpo360, a 3 days Hackathon Challenge in JNTUGV, Vizianagaram.
+This project is implemented for the InnoExpo360, a 3-day Hackathon Challenge in JNTUGV, Vizianagaram.
+We secured 2nd place in the competition.
 
 ## Overview
 
@@ -59,7 +60,7 @@ To get started with the Product Price Comparator project, follow these steps:
 
 ## Contributing
 
-This project is open for the contribution.
+This project is open for contribution.
 If you'd like to contribute to this project, please follow these guidelines:
 
 - Fork the repository on GitHub.
