@@ -1,6 +1,6 @@
 # Product Price Comparator
 
-This project is implemented for the HackInnovation360, a 3 days Hackathon Challenge in JNTUGV, Vizianagaram.
+This project is implemented for the InnoExpo360, a 3 days Hackathon Challenge in JNTUGV, Vizianagaram.
 
 ## Overview
 
